@@ -20,9 +20,22 @@ orquestrado com Docker Compose.
 
 ## Estrutura do Projeto
 
-``` ├── docker-compose.yml ├── .env ├── README.md ├── data-generator/ │   ├──
-Dockerfile │   ├── requirements.txt │   └── app/ │       └── generate_data.py
-├── nginx/ │   ├── Dockerfile │   └── nginx.conf └── postgres/ └── init.sql ```
+```
+├── docker-compose.yml 
+├── .env 
+├── README.md 
+├── data-generator/ 
+│   ├── Dockerfile 
+│   ├── requirements.txt 
+│   └── app/ 
+│       └── generate_data.py
+├── nginx/ 
+│   
+├── Dockerfile 
+│   └── nginx.conf 
+└── postgres/ 
+└── init.sql 
+```
 
 ## Guia de Implementação
 
@@ -52,6 +65,7 @@ mesmo?
   ```bash git clone
   https://github.com/PETCC-UFRN/docker-2025.1-final-project.git cd
   docker-2025.1-final-project
+  ```
 
 2. Edite o arquivo `.env` conforme necessário.
 
@@ -59,11 +73,15 @@ mesmo?
 
 1. Inicie todos os serviços:
 
-  ```bash docker compose up -d ```
+  ```bash
+ docker compose up -d
+ ```
 
 2. Verifique se todos os containers estão rodando:
 
-```bash docker compose ps ```
+ ```bash
+ docker compose ps
+ ```
 
 ## Autor
 
