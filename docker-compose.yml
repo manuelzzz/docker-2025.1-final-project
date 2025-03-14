@@ -2,6 +2,7 @@
 # TODOs:
 # - Configure uma rede interna para os 3 containers se comnuicarem
 # - Configure os volumes para que os dados se tornem persistentes
+# - Configure as variáveis de ambiente definadas em .env nos containers necessário, use ${nome_da_variavel} para expandi-la
 # 
 # Endereço da aplicação: http://localhost:3000/setup
 #
