@@ -14,12 +14,15 @@ services:
     image: postgres:13
     container_name: app-postgres
     restart: unless-stopped
+    networks:
+      - network1
     volumes:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - app-postgres-volume:/var/lib/postgres/data
     environment:
-      POSTGRES_USER: 
-      POSTGRES_PASSWORD: 
-      POSTGRES_DB: 
+      POSTGRES_USER: ${APP_DB_USER}
+      POSTGRES_PASSWORD: ${APP_DB_PASSWORD}
+      POSTGRES_DB: ${APP_DB_NAME}
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${APP_DB_USER}"]
       interval: 10s
@@ -31,10 +34,11 @@ services:
     container_name: metabase-postgres
     restart: unless-stopped
     volumes:
+      - metabase-postgres:/var/lib/postgres/data
     environment:
-      POSTGRES_USER: 
-      POSTGRES_PASSWORD: 
-      POSTGRES_DB: 
+      POSTGRES_USER: ${METABASE_DB_USER}
+      POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD}
+      POSTGRES_DB: ${METABASE_DB_NAME}
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${METABASE_DB_USER}"]
       interval: 10s
@@ -45,15 +49,17 @@ services:
     image: metabase/metabase:latest
     container_name: metabase-app
     restart: unless-stopped
+    networks:
+      - network1
     depends_on:
       metabase-postgres:
         condition: service_healthy
     environment:
       MB_DB_TYPE: postgres
-      MB_DB_DBNAME: 
+      MB_DB_DBNAME: ${METABASE_DB_NAME}
       MB_DB_PORT: 5432
-      MB_DB_USER: 
-      MB_DB_PASS: 
+      MB_DB_USER: ${METABASE_DB_USER}
+      MB_DB_PASS: ${METABASE_DB_PASSWORD}
       MB_DB_HOST: metabase-postgres
     volumes:
       - metabase_data:/metabase-data
@@ -66,6 +72,8 @@ services:
   data-generator:
     build:
       context: ./data-generator
+    networks: 
+      - network1
     container_name: metabase-data-generator
     restart: unless-stopped
     depends_on:
@@ -73,14 +81,16 @@ services:
         condition: service_healthy
     environment:
       POSTGRES_HOST: app-postgres
-      POSTGRES_DB: 
-      POSTGRES_USER: 
-      POSTGRES_PASSWORD: 
+      POSTGRES_DB: ${APP_DB_NAME}
+      POSTGRES_USER: ${APP_DB_USER}
+      POSTGRES_PASSWORD: ${APP_DB_PASSWORD}
       DATA_GENERATION_INTERVAL: 60
 
   nginx:
     build:
       context: ./nginx
+    networks:
+      - network1
     container_name: metabase-nginx
     restart: unless-stopped
     ports:
@@ -90,7 +100,10 @@ services:
         condition: service_healthy
 
 networks:
-  # E as redes?
+  network1:
+    driver: bridge
 
 volumes:
-  # Que volume vamos precisar?
+  app-postgres-volume:
+  metabase-postgres:
+  metabase_data:
