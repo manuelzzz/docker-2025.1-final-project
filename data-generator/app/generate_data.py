@@ -11,9 +11,9 @@ load_dotenv()
 
 db_params = {
     "host": os.getenv("POSTGRES_HOST", "postgres"),
-    "database": os.getenv("POSTGRES_DB", "metabase_data"),
-    "user": os.getenv("POSTGRES_USER", "metabase"),
-    "password": os.getenv("POSTGRES_PASSWORD", "metabase_secure_password"),
+    "database": os.getenv("POSTGRES_DB", "app_data"),
+    "user": os.getenv("POSTGRES_USER", "app_data"),
+    "password": os.getenv("POSTGRES_PASSWORD", "app_password"),
 }
 
 # Data generation interval in seconds
