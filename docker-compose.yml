@@ -1,0 +1,95 @@
+#
+# TODOs:
+# - Configure uma rede interna para os 3 containers se comnuicarem
+# - Configure os volumes para que os dados se tornem persistentes
+# 
+# Endereço da aplicação: http://localhost:3000/setup
+#
+# Importante: o caminho para armazenar dados no postgres é /var/lib/postgres/data
+
+
+services:
+  app-postgres:
+    image: postgres:13
+    container_name: app-postgres
+    restart: unless-stopped
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_USER: 
+      POSTGRES_PASSWORD: 
+      POSTGRES_DB: 
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${APP_DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  metabase-postgres:
+    image: postgres:13 
+    container_name: metabase-postgres
+    restart: unless-stopped
+    volumes:
+    environment:
+      POSTGRES_USER: 
+      POSTGRES_PASSWORD: 
+      POSTGRES_DB: 
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${METABASE_DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase-app
+    restart: unless-stopped
+    depends_on:
+      metabase-postgres:
+        condition: service_healthy
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: 
+      MB_DB_PORT: 5432
+      MB_DB_USER: 
+      MB_DB_PASS: 
+      MB_DB_HOST: metabase-postgres
+    volumes:
+      - metabase_data:/metabase-data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  data-generator:
+    build:
+      context: ./data-generator
+    container_name: metabase-data-generator
+    restart: unless-stopped
+    depends_on:
+      app-postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: app-postgres
+      POSTGRES_DB: 
+      POSTGRES_USER: 
+      POSTGRES_PASSWORD: 
+      DATA_GENERATION_INTERVAL: 60
+
+  nginx:
+    build:
+      context: ./nginx
+    container_name: metabase-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      metabase:
+        condition: service_healthy
+
+networks:
+  # E as redes?
+
+volumes:
+  # Que volume vamos precisar?
